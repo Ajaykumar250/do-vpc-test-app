@@ -4,20 +4,23 @@ const { Pool } = require("pg");
 const app = express();
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  ssl: { rejectUnauthorized: false }
 });
 
 app.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
-    res.send("DB Connected ✅ Time: " + result.rows[0].now);
+    res.send("✅ Connected to Managed DB via VPC: " + result.rows[0].now);
   } catch (err) {
-    res.send("DB Connection Failed ❌ " + err.message);
+    res.send("❌ DB connection failed: " + err.message);
   }
 });
 
-const port = process.env.PORT || 3000;
-
-app.listen(port, () => {
-  console.log("Server running on port", port);
+app.listen(process.env.PORT || 3000, () => {
+  console.log("App running");
 });
